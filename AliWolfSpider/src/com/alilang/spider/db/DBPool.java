@@ -38,11 +38,19 @@ public class DBPool {
 		while (i < connPoolSize){
 			try {
 				connQueue.add(createConnection());
-			} catch (InstantiationException | IllegalAccessException
-					| ClassNotFoundException | SQLException e) {
+			} 
+			catch (SQLException e) {
+				logger.error("init -- DataBase link Faild!!!");
+				logger.error("please check DB property!!!");
+				e.printStackTrace();
+				System.exit(0);
+			}
+			catch (InstantiationException | IllegalAccessException
+					| ClassNotFoundException e) {
 				logger.error("init -- DataBase link Faild!!!");
 				e.printStackTrace();
-			}
+				System.exit(0);
+			} 
 			i ++;
 		}
 		logger.info("DataBase Connection Pool Init£¡£¡£¡");

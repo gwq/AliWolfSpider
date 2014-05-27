@@ -31,10 +31,11 @@ public class ContextloaderListener implements ServletContextListener{
 	public void contextInitialized(ServletContextEvent arg0) {
 		logger.info("Server Start!!!");
 		init();
-		if (AccountProperty.getInit() ==1 ){
-			batchFetchInit();
+
+		if (AccountProperty.getInit() == 1 ){
+			batchFetchInit();     //通过爬虫获取微博信息
 		}
-		new Thread(new TaskThread()).start();
+		new Thread(new TaskThread()).start(); //通过微博API获取增量信息
 	}
 	
 	/**
@@ -43,20 +44,26 @@ public class ContextloaderListener implements ServletContextListener{
 	public void init(){
 		DBProperty.init();
 		AccountProperty.init();
-		DBPool.initDBPool();
-		WeiBoUtil.friendsList = new WeiBoUtil().getFriendsByAPI();
+		DBPool.initDBPool(); //初始化数据库连接池
+		
+		if (!(new WeiBoUtil().weiboLogin())){ //初始化微博weibo.cn的cookie
+			logger.debug("Server Stop !!");
+			System.exit(0);
+		}
+		
+		WeiBoUtil.friendsList = new WeiBoUtil().getFriendsByAPI();//通过API获取用户
 	}
 	
 	public void batchFetchInit(){
 		//new ContextloaderListener().init();
-		//String time = "2014-05-26 00:00";
-		String time = null;
+		String time = "2014-05-27 18:00";
+		//String time = null;
 		WbDataDao wdd = new WbDataDao();
 		LinkedList<ThreadG> list = new LinkedList<ThreadG>();
 		LinkedList<String> friendlist = WeiBoUtil.friendsList;
 		logger.debug("User Number : "+friendlist.size());
 		//for(String name : friendlist){
-		for (int j = 0 ;j < 165 ;j ++){  //当前频率下查询超过165次会被封号
+		for (int j = 0 ;j < 150 ;j ++){  //当前频率下查询超过150次会被封号
 			for (int i=1 ; i < 2;i ++){
 				GetWeiboDBThread gbt = new GetWeiboDBThread(wdd, friendlist.get(j), i,time);
 				ThreadG tg = new ThreadG(gbt);

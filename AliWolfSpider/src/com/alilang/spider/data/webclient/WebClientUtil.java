@@ -133,6 +133,7 @@ public class WebClientUtil {
 							}
 							if (cookie.equals(loginFailCookie)){
 								logger.error("Î¢²©ÕËºÅ»òÃÜÂë´íÎó£¡£¡£¡");
+								return null;
 							}
 							break;
 						}

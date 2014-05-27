@@ -222,8 +222,12 @@ public class WeiBoUtil {
 	public LinkedList<String[]> getWeiboContent(String username, int page,
 			String dateStrlimit) {
 		boolean homePage = true;
-		if (WebClientUtil.cookie == null)
-			this.weiboLogin();
+		if (WebClientUtil.cookie == null){
+			if(weiboLogin()){
+				logger.debug("Server Stop !!");
+				System.exit(0);
+			}
+		}
 		if (WebClientUtil.cookie.equals(WebClientUtil.loginFailCookie)) { // 如果登录失败，依然没有获得cookie，则退出
 			return null;
 		}
@@ -446,7 +450,7 @@ public class WeiBoUtil {
 	/**
 	 * 模拟登陆，获取授权cookie
 	 */
-	public void weiboLogin() {
+	public boolean weiboLogin() {
 
 		String loginUrl = "http://login.weibo.cn/login/?ns=1&revalid=2&backURL=http://weibo.cn/?s2w=login&backTitle=微博&vt=4";
 		String result = WebClientUtil.sendRequest(loginUrl, null, null,
@@ -467,6 +471,9 @@ public class WeiBoUtil {
 		loginUrl = "http://login.weibo.cn/login/?rand=1164771177&backURL=http%3A%2F%2Fweibo.cn%2F%3Fs2w%3Dlogin&backTitle=%E5%BE%AE%E5%8D%9A&vt=4&revalid=2&ns=1";
 		result = WebClientUtil.sendRequest(loginUrl, params, null,
 				WebClientUtil.Post, WebClientUtil.setCookie);
+		if (result == null)
+			return false;
+		return true;
 
 	}
 
